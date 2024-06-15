@@ -1,0 +1,29 @@
+table {
+    border-collapse: collapse;
+  }
+  td {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+  .light {
+    background-color: #f0d9b5;
+  }
+  .dark {
+    background-color: #b58863;
+  }
+  .highlight {
+    background-color: yellow;
+  }
+  .knight {
+    font-weight: bold;
+    color: red;
+  }
+  .row-label,
+  .column-label {
+    font-weight: bold;
+  }
+  
