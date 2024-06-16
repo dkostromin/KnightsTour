@@ -143,6 +143,7 @@
       
       let completedMoves = []; //array storing completed moves
       let currentChessboardMoves = [];
+      let totalMovesCounter = 0;
       //console.log("completedMoves", completedMoves);
 
       function getCoords(x, y, completedMoves, iterationCounter = 0) {
@@ -160,7 +161,7 @@
         completedMoves.push(currentState);
 
         if (completedMoves.length === ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE) {
-          console.log("iterationCounter", iterationCounter);
+          console.log("Total attempted moves: ", totalMovesCounter);
           return completedMoves;
         }
 
@@ -175,13 +176,21 @@
               )
           );
 
+        for (let move of knightMoves) {
+            totalMovesCounter++;
+        }
+
+
         for (let move of validMoves) {
-          iterationCounter++;
+            totalMovesCounter++;
           const result = getCoords(move[0], move[1], [...completedMoves],iterationCounter);
           if (result) {
             return result;
+          } else {
+            
           }
         }
+        //console.log(`Attempted moves: ${totalMovesCounter}`);
 
         return false;
       }
