@@ -2,8 +2,8 @@ table {
     border-collapse: collapse;
   }
   td {
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
@@ -26,4 +26,22 @@ table {
   .column-label {
     font-weight: bold;
   }
+
+  .chessboard-size-input {
+    width: 50px;
+    height: 20px;
+    margin: 10px;
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+ .knight-iterations-input {
+    width: 50px;
+    height: 20px;
+    margin: 10px;
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+ }
   

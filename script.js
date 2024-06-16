@@ -1,9 +1,25 @@
+        const sizeInputLabel = document.createElement("label");
+        sizeInputLabel.textContent = "Chessboard Size";
+        document.body.appendChild(sizeInputLabel);
 
         const sizeInput = document.createElement("input");
-        sizeInput.type = "number";
+        sizeInput.type = "range";
         sizeInput.min = 5;
-        sizeInput.textContent = "Chessboard Size";
+        sizeInput.max = 10;
+        sizeInput.value = 5;
+        sizeInput.placeholder = "Chessboard Size";
+        sizeInput.className = "chessboard-size-input"; // Add a class
+        sizeInput.placeholder = "Chessboard Size"; // Set the placeholder text
         document.body.appendChild(sizeInput);
+
+        /* const knightIterations = document.createElement("label");
+        knightIterations.textContent = "Knight Iterations";
+        document.body.appendChild(knightIterations);
+
+        const totalMovesCounterDisplay = document.createElement("span");
+        totalMovesCounterDisplay.className = "total-moves-counter-display";
+        document.body.appendChild(totalMovesCounterDisplay); */
+        
 
       class ChessboardRenderer {
         /**
@@ -11,6 +27,7 @@
          * are more than enough for this practice.
          */
         static CHESSBOARD_SIZE = 5;
+        
         /**
          * Renders the full board
          */
@@ -18,7 +35,6 @@
             //trying to add a chessboard size to the page
             sizeInput.value = ChessboardRenderer.CHESSBOARD_SIZE;
             sizeInput.addEventListener("input", this.handleSizeChange);
-
 
 
             //end of trying to add a chessboard size to the page
@@ -51,9 +67,6 @@
               }`;
               cell.className = (y + x) % 2 === 0 ? "light" : "dark";
               cell.addEventListener("click", () => this.onCellClick(x, y));
-              // cell.addEventListener("click", () =>
-                // getCoords(x, y, completedMoves)
-              // );
               row.appendChild(cell);
             }
             // create and attach row number on the right side of the chessboard
@@ -97,21 +110,14 @@
             .then((result) => {
               const chessboardElement = document.getElementById("chessboard");
               if (result instanceof Array) {
-                //Would be great to have current Cell Position highlighted and consoled
-                //console.log('Array' , result);
-                //console.log('onCellClick', x + ' ' + y);
+
                 result.forEach((key, idx) => {
                   // find by cell key and attach step number following the result
                   const cellElement = document.getElementById(key);
                   if (cellElement) {
                     // crete element with step to display
                     const keyTextElement = document.createElement("span");
-
                     keyTextElement.textContent = idx + 1;
-                    //console.log(
-                    //"keyTextElement.textContent",
-                    //keyTextElement.textContent
-                    //);
                     cellElement.appendChild(keyTextElement);
                   }
                 });
@@ -140,8 +146,32 @@
         }
       }
 
+      // This class is responsible to do the knight's tour calculation
+      class KnightTour {
+        constructor(chessboard) {
+          this.chessboard = chessboard;
+        }
+
+        solveKnightTour(x, y) {
+          const result = getCoords(x, y, []);
+
+          if (result) {
+            console.log('Going through',result.map(([x, y]) =>
+                chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)));
+            console.log('Initial point is', chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE));
+            return result.map(([x, y]) =>
+              chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)
+              
+            );
+          } else {
+            return false;
+          }
+        }
+      }
+
       let completedMoves = []; //array storing completed moves
       let totalMovesCounter = 0;
+      let iterationCounter = 0;
 
       function getCoords(x, y, completedMoves, iterationCounter = 0) {
         //hardcoded possible moves for the knight
@@ -162,6 +192,8 @@
         //hard stop if all moves are completed
         if (completedMoves.length === ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE) {
           console.log("Total attempted moves: ", totalMovesCounter);
+          console.log("Total iterations: ", iterationCounter);
+          KnightTour.totalMovesCounter = totalMovesCounter;
           return completedMoves;
         }
         
@@ -170,9 +202,10 @@
             let newXposition = currentState[0] + move[0];
             let newYposition = currentState[1] + move[1];
 
-            //validation in ordre to be on the board as well as not complete the same step twice.
+            //validation in order to be on the board as well as not complete the same step twice.
             if (onTheBoard([newXposition, newYposition]) && !completedMoves.some(completed => newXposition === completed[0] && newYposition === completed[1])) {
-                const result = getCoords(newXposition, newYposition, [...completedMoves], iterationCounter);
+                iterationCounter++;
+                const result = getCoords(newXposition, newYposition, [...completedMoves]);
                 if (result) {
                   return result;
                 }
@@ -191,7 +224,7 @@
           x[1] >= 0
         );
       }
-
+      //function to convert the x, y coordinates to chessboard coordinates
       function chessboardCoordinates(x, y, chessboardSize) {
         const columns = String.fromCharCode("A".charCodeAt(0) + x);
         const row = ChessboardRenderer.CHESSBOARD_SIZE - y;
@@ -203,25 +236,5 @@
           this.size = size;
         }
       }
-
-      // This class is responsible to do the knight's tour calculation
-      class KnightTour {
-        constructor(chessboard) {
-          this.chessboard = chessboard;
-        }
-
-        solveKnightTour(x, y) {
-          const result = getCoords(x, y, []);
-
-          if (result) {
-            return result.map(([x, y]) =>
-              chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)
-            );
-          } else {
-            return false;
-          }
-        }
-      }
-
 
       ChessboardRenderer.render();
