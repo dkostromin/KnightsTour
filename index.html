@@ -19,39 +19,30 @@
         //console.log("func x", x);
         //console.log("func y", y);
         const knightMoves = [[-2, 1], [2, -1],[-1, 2], [1, -2], [2, 1],[-1, -2],[-2,-1],[1,2]]; // lets go with array of options
-        let currentState = [x,y] 
-        let calculatedState = []; // will store our optional values
-        let rawMoves = []; //array of arrays storing possible options
+        let currentPosition = [x,y] 
+        let calculatedPosition = []; // will store our optional values
+        let validMoves = []; //array of arrays storing possible options
         let currentCompletedMoves = completedMoves.slice();
         
-        currentCompletedMoves.push([...currentState]);
-        if (currentCompletedMoves.length === chessboardSize * chessboardSize) {
+        currentCompletedMoves.push([...currentPosition]);
+        if (currentCompletedMoves.length === (chessboardSize * chessboardSize - 1)) {
             const chessboardMove = chessboardCoordinates(x, y, chessboardSize);
             currentChessboardMoves.push([chessboardMove]);
             console.log('currentChessboardMoves', currentChessboardMoves);
             return currentChessboardMoves;
         }
-        let noWayBack = []; //array storing moves without already completed moves
-        console.log("currentState", currentState);
-        knightMoves.forEach((value) => {
+        //let noWayBack = []; //array storing moves without already completed moves
+        console.log("currentPosition", currentPosition);
+        knightMoves.forEach((move) => {
             //console.log("knightMoves value", value);
-            calculatedState[0] = currentState[0] + value[0];
-            calculatedState[1] = currentState[1] + value[1];
-            //console.log("calculatedState", calculatedState);
-            rawMoves.push([...calculatedState]); // create a copy of the array
+            calculatedPosition[0] = currentPosition[0] + move[0];
+            calculatedPosition[1] = currentPosition[1] + move[1];
+            let calculatedSPosition= [currentPosition[0] + move[0], currentPosition[1] + move[1]];
+            if (onTheBoard(calculatedPosition) && !currentCompletedMoves.includes(calculatedPosition.toString())) {
+                validMoves.push([...calculatedPosition]); // create a copy of the array
+            }
           });
           console.log('currentCompletedMoves', currentCompletedMoves);
-          //console.log('rawMoves', rawMoves);
-          validMoves = rawMoves.filter(onTheBoard); //shallow copy of the array with the moves up to board size
-          //console.log('validMoves onTheBoard', validMoves);
-          //store the completed moves
-          validMoves = validMoves.filter((value) => {
-            return currentCompletedMoves.every(completedMove => {
-                //console.log('completedMove', completedMove);
-                return value[0] !== completedMove[0] || value[1] !== completedMove[1];
-            });
-          });
-            
 
           console.log('validMoves', validMoves);
           if (validMoves.length > 0) {
@@ -75,17 +66,19 @@
           return (x[0] < chessboardSize && x[0] >= 0 ) && (x[1] < chessboardSize && x[1] >= 0);
         }
 
-        function chessboardCoordinates(x, y, chessboardSize) {
+        //function to convert the coordinates to chessboard coordinates
+        function chessboardCoordinates(moves, chessboardSize) {
             //our current coordinates are 0 based, so A5 is 0,0 and E1 is 4,4
-            const columns = String.fromCharCode('A'.charCodeAt(0) + x);
-            const row = chessboardSize - y;
-            const result = `${columns}${row}`;
-            return result;
+            return moves.map((move) => {
+              const x = move[0];
+              const y = move[1];
+              const columns = String.fromCharCode('A'.charCodeAt(0) + x);
+              const rows = chessboardSize - y;
+              const result = `${columns}${row}`;
+              return result;
+            })
         }
-        
-
-    
-
+  
       /**
        *
        * This test is to write solution for Knight's Route theory.
