@@ -10,75 +10,68 @@
   <body>
     <table id="chessboard"></table>
     <script>
-      const chessboardSize = 5;
+      const chessboardSize = 6;
       let completedMoves = []; //array storing completed moves
       let currentChessboardMoves = [];
       //console.log("completedMoves", completedMoves);
 
-      function getCoords(x,y, completedMoves) {
-        //console.log("func x", x);
-        //console.log("func y", y);
-        const knightMoves = [[-2, 1], [2, -1],[-1, 2], [1, -2], [2, 1],[-1, -2],[-2,-1],[1,2]]; // lets go with array of options
-        let currentPosition = [x,y] 
-        let calculatedPosition = []; // will store our optional values
-        let validMoves = []; //array of arrays storing possible options
-        let currentCompletedMoves = completedMoves.slice();
-        
-        currentCompletedMoves.push([...currentPosition]);
-        if (currentCompletedMoves.length === (chessboardSize * chessboardSize - 1)) {
-            const chessboardMove = chessboardCoordinates(x, y, chessboardSize);
-            currentChessboardMoves.push([chessboardMove]);
-            console.log('currentChessboardMoves', currentChessboardMoves);
-            return currentChessboardMoves;
-        }
-        //let noWayBack = []; //array storing moves without already completed moves
-        console.log("currentPosition", currentPosition);
-        knightMoves.forEach((move) => {
-            //console.log("knightMoves value", value);
-            calculatedPosition[0] = currentPosition[0] + move[0];
-            calculatedPosition[1] = currentPosition[1] + move[1];
-            let calculatedSPosition= [currentPosition[0] + move[0], currentPosition[1] + move[1]];
-            if (onTheBoard(calculatedPosition) && !currentCompletedMoves.includes(calculatedPosition.toString())) {
-                validMoves.push([...calculatedPosition]); // create a copy of the array
-            }
-          });
-          console.log('currentCompletedMoves', currentCompletedMoves);
+      function getCoords(x, y, completedMoves, iterationCounter = 0) {
+        const knightMoves = [
+          [-2, 1],
+          [2, -1],
+          [-1, 2],
+          [1, -2],
+          [2, 1],
+          [-1, -2],
+          [-2, -1],
+          [1, 2],
+        ];
+        let currentState = [x, y];
+        completedMoves.push(currentState);
 
-          console.log('validMoves', validMoves);
-          if (validMoves.length > 0) {
-            for (i = 0; i < validMoves.length; i++) {
-              const result = getCoords(validMoves[i][0], validMoves[i][1], currentCompletedMoves);
-              if (result === false) {
-                validMoves.splice(i,1); //remove the unsuccessful move from the array
-                i--; //decrement the counter to avoid skipping the next element
-              } else {
-                return true;
-              }
-            }
-          }
-          else {console.log('No more moves');
-            return false;
+        if (completedMoves.length === chessboardSize * chessboardSize) {
+          console.log("iterationCounter", iterationCounter);
+          return completedMoves;
+        }
+
+        let validMoves = knightMoves
+          .map((move) => [currentState[0] + move[0], currentState[1] + move[1]])
+          .filter(onTheBoard)
+          .filter(
+            (move) =>
+              !completedMoves.some(
+                (completed) =>
+                  move[0] === completed[0] && move[1] === completed[1]
+              )
+          );
+
+        for (let move of validMoves) {
+          iterationCounter++;
+          const result = getCoords(move[0], move[1], [...completedMoves],iterationCounter);
+          if (result) {
+            return result;
           }
         }
 
-        //function to check if the move is on the board
-        function onTheBoard(x) {
-          return (x[0] < chessboardSize && x[0] >= 0 ) && (x[1] < chessboardSize && x[1] >= 0);
-        }
+        return false;
+      }
 
-        //function to convert the coordinates to chessboard coordinates
-        function chessboardCoordinates(moves, chessboardSize) {
-            //our current coordinates are 0 based, so A5 is 0,0 and E1 is 4,4
-            return moves.map((move) => {
-              const x = move[0];
-              const y = move[1];
-              const columns = String.fromCharCode('A'.charCodeAt(0) + x);
-              const rows = chessboardSize - y;
-              const result = `${columns}${row}`;
-              return result;
-            })
-        }
-  
+      //function to check if the move is on the board
+      function onTheBoard(x) {
+        return (
+          x[0] < chessboardSize &&
+          x[0] >= 0 &&
+          x[1] < chessboardSize &&
+          x[1] >= 0
+        );
+      }
+
+      function chessboardCoordinates(x, y, chessboardSize) {
+        const columns = String.fromCharCode("A".charCodeAt(0) + x);
+        const row = chessboardSize - y;
+        return `${columns}${row}`;
+      }
+
       /**
        *
        * This test is to write solution for Knight's Route theory.
@@ -134,38 +127,46 @@
          * solution for Knight's Tour from this cell.
          */
         solveKnightTour(x, y) {
-          //console.log("x", x);
+          const result = getCoords(x, y, []);
+
+          if (result) {
+            return result.map(([x, y]) =>
+              chessboardCoordinates(x, y, chessboardSize)
+            );
+          } else {
+            return false;
+          }
           //console.log("y", y);
           //try to create an initial element highlighting the current position
-          return x % 2 !== 0
-            ? false
-            : [
-                "A5",
-                "C4",
-                "E3",
-                "D1",
-                "B2",
-                "A4",
-                "C3",
-                "D5",
-                "B4",
-                "A2",
-                "C1",
-                "E2",
-                "D4",
-                "B5",
-                "A3",
-                "B1",
-                "D2",
-                "E4",
-                "C5",
-                "B3",
-                "A1",
-                "C2",
-                "E1",
-                "D3",
-                "E5",
-              ];
+          // return x % 2 !== 0
+          // ? false
+          // : [
+          // "A5",
+          // "C4",
+          // "E3",
+          // "D1",
+          // "B2",
+          // "A4",
+          // "C3",
+          // "D5",
+          // "B4",
+          // "A2",
+          // "C1",
+          // "E2",
+          // "D4",
+          // "B5",
+          // "A3",
+          // "B1",
+          // "D2",
+          // "E4",
+          // "C5",
+          // "B3",
+          // "A1",
+          // "C2",
+          // "E1",
+          // "D3",
+          // "E5",
+          // ];
         }
       }
 
@@ -187,7 +188,7 @@
          * For faster processing chessboard with 5x5 dementions
          * are more than enough for this practice.
          */
-        static CHESSBOARD_SIZE = 5;
+        static CHESSBOARD_SIZE = 6;
         /**
          * Renders the full board
          */
@@ -221,7 +222,9 @@
               }`;
               cell.className = (y + x) % 2 === 0 ? "light" : "dark";
               cell.addEventListener("click", () => this.onCellClick(x, y));
-              cell.addEventListener("click", () => getCoords(x, y, completedMoves));
+              // cell.addEventListener("click", () =>
+                // getCoords(x, y, completedMoves)
+              // );
               row.appendChild(cell);
             }
             // create and attach row number on the right side of the chessboard
