@@ -140,13 +140,11 @@
         }
       }
 
-      
       let completedMoves = []; //array storing completed moves
-      let currentChessboardMoves = [];
       let totalMovesCounter = 0;
-      //console.log("completedMoves", completedMoves);
 
       function getCoords(x, y, completedMoves, iterationCounter = 0) {
+        //hardcoded possible moves for the knight
         const knightMoves = [
           [-2, 1],
           [2, -1],
@@ -158,13 +156,15 @@
           [1, 2],
         ];
         let currentState = [x, y];
+        //store current state in the completed moves array so you cannot go back to it
         completedMoves.push(currentState);
 
+        //hard stop if all moves are completed
         if (completedMoves.length === ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE) {
           console.log("Total attempted moves: ", totalMovesCounter);
           return completedMoves;
         }
-
+        //validation in order to check if the move is on the board and if it was already completed
         let validMoves = knightMoves
           .map((move) => [currentState[0] + move[0], currentState[1] + move[1]])
           .filter(onTheBoard)
@@ -175,7 +175,7 @@
                   move[0] === completed[0] && move[1] === completed[1]
               )
           );
-
+        
         for (let move of knightMoves) {
             totalMovesCounter++;
         }
