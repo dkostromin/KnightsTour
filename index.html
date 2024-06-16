@@ -16,8 +16,6 @@
       //console.log("completedMoves", completedMoves);
 
       function getCoords(x,y, completedMoves) {
-        
-
         //console.log("func x", x);
         //console.log("func y", y);
         const knightMoves = [[-2, 1], [2, -1],[-1, 2], [1, -2], [2, 1],[-1, -2],[-2,-1],[1,2]]; // lets go with array of options
@@ -26,9 +24,13 @@
         let rawMoves = []; //array of arrays storing possible options
         let currentCompletedMoves = completedMoves.slice();
         
-       
-        
         currentCompletedMoves.push([...currentState]);
+        if (currentCompletedMoves.length === chessboardSize * chessboardSize) {
+            const chessboardMove = chessboardCoordinates(x, y, chessboardSize);
+            currentChessboardMoves.push([chessboardMove]);
+            console.log('currentChessboardMoves', currentChessboardMoves);
+            return currentChessboardMoves;
+        }
         let noWayBack = []; //array storing moves without already completed moves
         console.log("currentState", currentState);
         knightMoves.forEach((value) => {
@@ -53,15 +55,20 @@
 
           console.log('validMoves', validMoves);
           if (validMoves.length > 0) {
-            getCoords(validMoves[0][0], validMoves[0][1], currentCompletedMoves);
-          } else {
-            const chessboardMove = chessboardCoordinates(x, y, chessboardSize);
-            currentChessboardMoves.push([chessboardMove]);
-            console.log('currentChessboardMoves', currentChessboardMoves);
-            return currentChessboardMoves;
-          }   
+            for (i = 0; i < validMoves.length; i++) {
+              const result = getCoords(validMoves[i][0], validMoves[i][1], currentCompletedMoves);
+              if (result === false) {
+                validMoves.splice(i,1); //remove the unsuccessful move from the array
+                i--; //decrement the counter to avoid skipping the next element
+              } else {
+                return true;
+              }
+            }
+          }
+          else {console.log('No more moves');
+            return false;
+          }
         }
-        
 
         //function to check if the move is on the board
         function onTheBoard(x) {
