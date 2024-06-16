@@ -164,36 +164,23 @@
           console.log("Total attempted moves: ", totalMovesCounter);
           return completedMoves;
         }
-        //validation in order to check if the move is on the board and if it was already completed
-        let validMoves = knightMoves
-          .map((move) => [currentState[0] + move[0], currentState[1] + move[1]])
-          .filter(onTheBoard)
-          .filter(
-            (move) =>
-              !completedMoves.some(
-                (completed) =>
-                  move[0] === completed[0] && move[1] === completed[1]
-              )
-          );
         
         for (let move of knightMoves) {
             totalMovesCounter++;
-        }
+            let newXposition = currentState[0] + move[0];
+            let newYposition = currentState[1] + move[1];
 
-
-        for (let move of validMoves) {
-            totalMovesCounter++;
-          const result = getCoords(move[0], move[1], [...completedMoves],iterationCounter);
-          if (result) {
-            return result;
-          } else {
-            
+            //validation in ordre to be on the board as well as not complete the same step twice.
+            if (onTheBoard([newXposition, newYposition]) && !completedMoves.some(completed => newXposition === completed[0] && newYposition === completed[1])) {
+                const result = getCoords(newXposition, newYposition, [...completedMoves], iterationCounter);
+                if (result) {
+                  return result;
+                }
+              }
+            }
+          
+            return false;
           }
-        }
-        //console.log(`Attempted moves: ${totalMovesCounter}`);
-
-        return false;
-      }
 
       //function to check if the move is on the board
       function onTheBoard(x) {
