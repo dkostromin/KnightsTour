@@ -12,6 +12,8 @@ sizeInput.className = "chessboard-size-input";
 sizeInput.placeholder = "Chessboard Size";
 document.body.appendChild(sizeInput);
 
+document.body.insertAdjacentHTML('beforeend', '<div id="fireworks-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>');
+
 class ChessboardRenderer {
   static CHESSBOARD_SIZE = 5;
 
@@ -78,7 +80,7 @@ class ChessboardRenderer {
     ChessboardRenderer.render();
     const chessboard = new Chessboard(ChessboardRenderer.CHESSBOARD_SIZE);
     const knightTour = new KnightTour(chessboard);
-
+  
     try {
       await knightTour.solveKnightTour(x, y);
       ChessboardRenderer.showFinalResult(knightTour.completedMoves);
@@ -89,12 +91,24 @@ class ChessboardRenderer {
 
   static showFinalResult(moves) {
     const chessboardElement = document.getElementById("chessboard");
-    const row = document.createElement("tr");
-    const resultElement = document.createElement("td");
-    resultElement.colSpan = ChessboardRenderer.CHESSBOARD_SIZE + 2;
-    resultElement.textContent = moves.map((move, idx) => `${idx + 1}. ${chessboardCoordinates(move[0], move[1], ChessboardRenderer.CHESSBOARD_SIZE)}`).join("; ");
-    row.appendChild(resultElement);
-    chessboardElement.appendChild(row);
+  
+    // Clear any previous final message
+    const previousResult = document.querySelector('.final-result');
+    if (previousResult) {
+      previousResult.remove();
+    }
+  
+    // Add the new result
+    const resultRow = document.createElement("tr");
+    const resultCell = document.createElement("td");
+    resultCell.className = "final-result";
+    resultCell.colSpan = ChessboardRenderer.CHESSBOARD_SIZE + 2;
+    resultCell.textContent = moves.map((move, idx) => `${idx + 1}. ${chessboardCoordinates(move[0], move[1], ChessboardRenderer.CHESSBOARD_SIZE)}`).join("; ");
+    resultRow.appendChild(resultCell);
+    chessboardElement.appendChild(resultRow);
+  
+    // Trigger fireworks after showing the result
+    triggerFireworks();
   }
 
   static showIncompleteMessage() {
@@ -223,6 +237,35 @@ function chessboardCoordinates(x, y, chessboardSize) {
   const row = chessboardSize - y;
   return `${columns}${row}`;
 }
+
+function triggerFireworks() {
+  const container = document.getElementById('fireworks-container');
+  if (!container) {
+    console.error('Fireworks container not found');
+    return;
+  }
+
+  const fireworks = new Fireworks(container, {
+    speed: 4,
+    acceleration: 1.05,
+    friction: 0.97,
+    gravity: 1.5,
+    particles: 50,
+    trace: 3,
+    explosion: 5,
+    autoresize: true,
+    brightness: { min: 50, max: 80 },
+    boundaries: { x: 50, y: 50, width: container.clientWidth, height: container.clientHeight },
+    sound: { enable: false } // Ensure no sound for simplicity
+  });
+
+  fireworks.start();
+  setTimeout(() => {
+    fireworks.stop();
+  }, 5000); // Fireworks for 5 seconds
+}
+
+  
 
 class Chessboard {
   constructor(size) {
