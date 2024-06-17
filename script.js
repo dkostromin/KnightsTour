@@ -148,26 +148,80 @@ class KnightTour {
     this.chessboard = chessboard;
   }
 
-  solveKnightTour(x, y) {
-    const result = getCoords(x, y, []);
+  async solveKnightTour(x, y) {
+    const result = await this.getCoords(x, y, []);
+    return result;
+  }
 
-    if (result) {
-      console.log(
-        "Going through",
-        result.map(([x, y]) =>
-          chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)
-        )
-      );
-      console.log(
-        "Initial point is",
-        chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)
-      );
-      return result.map(([x, y]) =>
-        chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE)
-      );
-    } else {
-      return false;
+  async getCoords(x, y, completedMoves, iterationCounter = 0) {
+    let currentState = [x, y];
+    completedMoves.push(currentState);
+
+    if (
+      completedMoves.length ===
+      ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE
+    ) {
+      console.log("Total attempted moves: ", totalMovesCounter);
+      console.log("Total iterations: ", iterationCounter);
+      KnightTour.totalMovesCounter = totalMovesCounter;
+      return completedMoves;
     }
+
+    let sortedMoves = knightMoves
+      .map(move => {
+        let newX = x + move[0];
+        let newY = y + move[1];
+        return {
+          move,
+          count: countOnwardMoves(newX, newY, completedMoves)
+        };
+      })
+      .filter(({ move }) => onTheBoard([x + move[0], y + move[1]]) &&
+        !completedMoves.some(completed => (x + move[0]) === completed[0] && (y + move[1]) === completed[1])
+      )
+      .sort((a, b) => a.count - b.count);
+
+    for (let { move } of sortedMoves) {
+      totalMovesCounter++;
+      let newXposition = currentState[0] + move[0];
+      let newYposition = currentState[1] + move[1];
+
+      iterationCounter++;
+      if (iterationCounter >= 1000) {
+        return false;
+      }
+
+      const result = await this.getCoords(
+        newXposition,
+        newYposition,
+        [...completedMoves],
+        iterationCounter
+      );
+
+      if (result) {
+        await this.updateBoardWithResult(completedMoves);
+        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+        return result;
+      }
+    }
+
+    return false;
+  }
+
+  async updateBoardWithResult(moves) {
+    const chessboardElement = document.getElementById("chessboard");
+    chessboardElement.innerHTML = "";
+    ChessboardRenderer.render();
+
+    moves.forEach(([x, y], idx) => {
+      const key = chessboardCoordinates(x, y, ChessboardRenderer.CHESSBOARD_SIZE);
+      const cellElement = document.getElementById(key);
+      if (cellElement) {
+        const keyTextElement = document.createElement("span");
+        keyTextElement.textContent = idx + 1;
+        cellElement.appendChild(keyTextElement);
+      }
+    });
   }
 }
 
@@ -177,64 +231,64 @@ const knightMoves = [
   [2, 1], [-1, -2], [-2, -1], [1, 2]
 ];
 
-function getCoords(x, y, completedMoves, iterationCounter = 0) {
-  //hardcoded possible moves for the knight
+// function getCoords(x, y, completedMoves, iterationCounter = 0) {
+//   //hardcoded possible moves for the knight
 
-  let currentState = [x, y];
-  //store current state in the completed moves array so you cannot go back to it
-  completedMoves.push(currentState);
+//   let currentState = [x, y];
+//   //store current state in the completed moves array so you cannot go back to it
+//   completedMoves.push(currentState);
 
-  //hard stop if all moves are completed
-  if (
-    completedMoves.length ===
-    ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE
-  ) {
-    console.log("Total attempted moves: ", totalMovesCounter);
-    console.log("Total iterations: ", iterationCounter);
-    KnightTour.totalMovesCounter = totalMovesCounter;
-    return completedMoves;
-  }
-  //sort the moves based on the number of onward moves
-  let sortedMoves = knightMoves
-    .map(move => {
-      let newX = x + move[0];
-      let newY = y + move[1];
-      return {
-        move,
-        count: countOnwardMoves(newX, newY, completedMoves)
-      };
-    })
-    .filter(({ move }) => onTheBoard([x + move[0], y + move[1]]) &&
-      !completedMoves.some(completed => (x + move[0]) === completed[0] && (y + move[1]) === completed[1])
-    )
-    .sort((a, b) => a.count - b.count);
-  //console.log("knightMoves", knightMoves);
+//   //hard stop if all moves are completed
+//   if (
+//     completedMoves.length ===
+//     ChessboardRenderer.CHESSBOARD_SIZE * ChessboardRenderer.CHESSBOARD_SIZE
+//   ) {
+//     console.log("Total attempted moves: ", totalMovesCounter);
+//     console.log("Total iterations: ", iterationCounter);
+//     KnightTour.totalMovesCounter = totalMovesCounter;
+//     return completedMoves;
+//   }
+//   //sort the moves based on the number of onward moves
+//   let sortedMoves = knightMoves
+//     .map(move => {
+//       let newX = x + move[0];
+//       let newY = y + move[1];
+//       return {
+//         move,
+//         count: countOnwardMoves(newX, newY, completedMoves)
+//       };
+//     })
+//     .filter(({ move }) => onTheBoard([x + move[0], y + move[1]]) &&
+//       !completedMoves.some(completed => (x + move[0]) === completed[0] && (y + move[1]) === completed[1])
+//     )
+//     .sort((a, b) => a.count - b.count);
+//   //console.log("knightMoves", knightMoves);
 
-  for (let {move} of sortedMoves) {
-    totalMovesCounter++;
-    let newXposition = currentState[0] + move[0];
-    let newYposition = currentState[1] + move[1];
-    iterationCounter++;
-    if (iterationCounter >= 1000) {
-        return false;
-      }
-    //validation in order to be on the board as well as not complete the same step twice.
-    {
-      const result = getCoords(
-        newXposition,
-        newYposition,
-        [...completedMoves],
-        iterationCounter
-      );
+//   for (let {move} of sortedMoves) {
+//     totalMovesCounter++;
+//     let newXposition = currentState[0] + move[0];
+//     let newYposition = currentState[1] + move[1];
+//     iterationCounter++;
+//     if (iterationCounter >= 1000) {
+//         return false;
+//       }
+//     //validation in order to be on the board as well as not complete the same step twice.
+//     {
+//       const result = getCoords(
+//         newXposition,
+//         newYposition,
+//         [...completedMoves],
+//         iterationCounter
+//       );
 
-      if (result) {
-        return result;
-      }
-    }
-  }
+//       if (result) {
+//         return result;
+//       }
+//     }
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 function countOnwardMoves(x, y, completedMoves) {
   console.log("countOnwardMoves", x, y);
