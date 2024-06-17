@@ -33,8 +33,10 @@ class ChessboardRenderer {
   static render() {
     //trying to add a chessboard size to the page
     sizeInput.value = ChessboardRenderer.CHESSBOARD_SIZE;
-    sizeInput.addEventListener("input", this.handleSizeChange);
-
+    if (!sizeInput.hasListener) {
+        sizeInput.addEventListener("input", this.handleSizeChange);
+        sizeInput.hasListener = true;
+      }
     //end of trying to add a chessboard size to the page
     const chessboardElement = document.getElementById("chessboard");
     chessboardElement.innerHTML = "";
@@ -169,23 +171,15 @@ class KnightTour {
   }
 }
 
-let completedMoves = []; //array storing completed moves
 let totalMovesCounter = 0;
-let iterationCounter = 0;
 const knightMoves = [
-    [-2, 1],
-    [2, -1],
-    [-1, 2],
-    [1, -2],
-    [2, 1],
-    [-1, -2],
-    [-2, -1],
-    [1, 2],
-  ];
+  [-2, 1], [2, -1], [-1, 2], [1, -2],
+  [2, 1], [-1, -2], [-2, -1], [1, 2]
+];
 
 function getCoords(x, y, completedMoves, iterationCounter = 0) {
   //hardcoded possible moves for the knight
-  
+
   let currentState = [x, y];
   //store current state in the completed moves array so you cannot go back to it
   completedMoves.push(currentState);
@@ -200,32 +194,39 @@ function getCoords(x, y, completedMoves, iterationCounter = 0) {
     KnightTour.totalMovesCounter = totalMovesCounter;
     return completedMoves;
   }
+  //sort the moves based on the number of onward moves
+  let sortedMoves = knightMoves
+    .map(move => {
+      let newX = x + move[0];
+      let newY = y + move[1];
+      return {
+        move,
+        count: countOnwardMoves(newX, newY, completedMoves)
+      };
+    })
+    .filter(({ move }) => onTheBoard([x + move[0], y + move[1]]) &&
+      !completedMoves.some(completed => (x + move[0]) === completed[0] && (y + move[1]) === completed[1])
+    )
+    .sort((a, b) => a.count - b.count);
+  //console.log("knightMoves", knightMoves);
 
-  knightMoves.sort((a, b) => {
-    console.log("a", a);
-    const countA = countOnwardMoves(x + a[0], y + a[1], completedMoves);
-    console.log("countA", countA);
-    const countB = countOnwardMoves(x + b[0], y + b[1], completedMoves);
-    console.log("countB", countB);
-    return countA - countB;
-  });
-
-  for (let move of knightMoves) {
+  for (let {move} of sortedMoves) {
     totalMovesCounter++;
     let newXposition = currentState[0] + move[0];
     let newYposition = currentState[1] + move[1];
-
+    iterationCounter++;
+    if (iterationCounter >= 1000) {
+        return false;
+      }
     //validation in order to be on the board as well as not complete the same step twice.
-    if (
-      onTheBoard([newXposition, newYposition]) &&
-      !completedMoves.some(
-        (completed) =>
-          newXposition === completed[0] && newYposition === completed[1]
-      )
-    ) {
-      iterationCounter++;
-      const result = getCoords(newXposition, newYposition, [...completedMoves],iterationCounter);
-      
+    {
+      const result = getCoords(
+        newXposition,
+        newYposition,
+        [...completedMoves],
+        iterationCounter
+      );
+
       if (result) {
         return result;
       }
@@ -236,7 +237,7 @@ function getCoords(x, y, completedMoves, iterationCounter = 0) {
 }
 
 function countOnwardMoves(x, y, completedMoves) {
-    console.log("countOnwardMoves", x, y);
+  console.log("countOnwardMoves", x, y);
   let count = 0;
   for (let move of knightMoves) {
     let newX = x + move[0];

@@ -1,47 +1,84 @@
-table {
-    border-collapse: collapse;
-  }
-  td {
-    width: 100px;
-    height: 100px;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    overflow-wrap: anywhere;
-  }
-  .light {
-    background-color: #f0d9b5;
-  }
-  .dark {
-    background-color: #b58863;
-  }
-  .highlight {
-    background-color: yellow;
-  }
-  .knight {
-    font-weight: bold;
-    color: red;
-  }
-  .row-label,
-  .column-label {
-    font-weight: bold;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap'); /* A chalk-like font */
 
-  .chessboard-size-input {
-    width: 50px;
-    height: 20px;
-    margin: 10px;
-    padding: 5px;
-    font-size: 14px;
-    text-align: center;
+/* General Body Styling */
+body {
+  background-color: #050902; /* Dark background color (almost black) */
+  color: #FFFFFF;
+  font-family: 'Coming Soon', cursive; /* New chalk-like font */
 }
 
- .knight-iterations-input {
-    width: 50px;
-    height: 20px;
-    margin: 10px;
-    padding: 5px;
-    font-size: 14px;
-    text-align: center;
- }
-  
+/* Table Styling */
+table {
+  border-collapse: collapse;
+  background-color: #000000; /* Black background color for the chessboard */
+}
+
+/* Table Cell Styling */
+td {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Light white border for chalk effect */
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1); /* Inner shadow for chalk effect */
+  font-family: 'Coming Soon', cursive; /* Ensure text appears handwritten */
+}
+
+/* Light and Dark Cell Styling */
+.light {
+  background-color: #111; /* Slightly lighter than black */
+}
+
+.dark {
+  background-color: #000; /* Black (matches table background) */
+}
+
+.highlight {
+  background-color: #FFFF00;
+}
+
+/* Knight Piece Styling */
+.knight {
+  font-weight: bold;
+  color: #FF0000;
+}
+
+/* Row and Column Labels */
+.row-label,
+.column-label {
+  font-weight: bold;
+  text-shadow: none;
+  border: none;
+  color: #FFFFFF; /* Ensure labels are visible */
+}
+
+/* Input Styling */
+.chessboard-size-input,
+.knight-iterations-input {
+  width: 50px;
+  height: 20px;
+  margin: 10px;
+  padding: 5px;
+  font-size: 14px;
+  text-align: center;
+  background-color: #333; /* Dark background for inputs */
+  color: #FFF;
+  border: none;
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.1); /* Inner shadow for chalk effect */
+  font-family: 'Coming Soon', cursive; /* Ensure text appears handwritten */
+}
+
+/* Adding a subtle chalk-like texture to the board */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Subtle dark chalkboard texture */
+  opacity: 0.2; /* Make the texture less intense */
+}
