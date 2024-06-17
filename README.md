@@ -1,6 +1,4 @@
-# KnightsTour
-
-Knight's Tour Algorithm
+# KnightsTour Algorithm
 
 Welcome to my GitHub repository for the Knight's Tour algorithm! This project showcases my implementation of the Knight's Tour problem using advanced techniques such as backtracking and Warnsdorff's Rule. The code is optimized for efficiency and clarity, featuring detailed logging and iteration tracking to handle complex scenarios.
 
@@ -9,3 +7,5 @@ Welcome to my GitHub repository for the Knight's Tour algorithm! This project sh
 - **Detailed Logging**: Provides comprehensive logs for debugging and performance analysis.
 - **Iteration Tracking**: Ensures iteration limits are respected to avoid infinite loops.
 - **Clear Documentation**: Well-commented code for easy understanding and modification.
+
+- Wiki [link](https://en.wikipedia.org/wiki/Knight%27s_tour)
