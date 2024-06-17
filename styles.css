@@ -21,6 +21,9 @@ td {
   vertical-align: middle;
   cursor: pointer;
   overflow-wrap: anywhere;
+}
+
+.chessboard-cell {
   border: 1px solid rgba(255, 255, 255, 0.3); /* Light white border for chalk effect */
   box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1); /* Inner shadow for chalk effect */
   font-family: 'Coming Soon', cursive; /* Ensure text appears handwritten */
